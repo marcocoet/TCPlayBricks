@@ -22,7 +22,7 @@ export default function Signup() {
       return;
     }
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: formData.email,
       password: formData.password,
     });
@@ -30,6 +30,18 @@ export default function Signup() {
     if (error) {
       alert(error.message);
     } else {
+      // ✅ Insert into profiles table
+      const user = data.user;
+      if (user) {
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .insert([{ id: user.id, email: user.email }]);
+
+        if (profileError) {
+          console.error("Error creating profile:", profileError);
+        }
+      }
+
       alert("Signup successful! Check your email to confirm your account.");
       navigate("/");
     }

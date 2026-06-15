@@ -16,3 +16,13 @@ create table lego_sets (
   image_url text,
   created_at timestamp default now()
 );
+
+--cart table
+create table cart (
+  cart_id uuid default uuid_generate_v4() primary key,
+  user_id uuid references auth.users(id) on delete cascade,
+  set_id int references lego_sets(set_id),
+  quantity int default 1,
+  created_at timestamp default now()
+);
+
