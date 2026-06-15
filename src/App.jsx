@@ -5,6 +5,7 @@ import Signup from "./pages/signup.jsx";
 import Landingpage from "./pages/landingpage.jsx";
 import Login from "./pages/login.jsx";
 import Products from "./pages/products.jsx";
+import Productspage from "./pages/productspage.jsx";
 function App() {
   return (
     <Router>
@@ -14,6 +15,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/products/:slug" element={<Products />} />
+          <Route path="/products" element={<Productspage />} />
         </Routes>
       </MainLayout>
     </Router>

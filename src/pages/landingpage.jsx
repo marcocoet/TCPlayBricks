@@ -92,7 +92,7 @@ export default function Landingpage() {
       <div className="w-full max-w-md">
         <input
           type="text"
-          placeholder="Search for a theme or set number..."
+          placeholder="Search for a set name or set number..."
           value={searchTerm}
           onChange={handleSearch}
           className="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
