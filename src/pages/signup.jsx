@@ -48,12 +48,13 @@ export default function Signup() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen ">
       <form
         onSubmit={handleSubmit}
+        data-aos="fade-up"
         className="bg-white shadow-md rounded-lg p-8 w-full max-w-md"
       >
-        <h2 className="text-2xl font-bold mb-6 text-center text-red-500">
+        <h2 className="text-2xl font-bold mb-6 text-center text-blue-500">
           Sign Up
         </h2>
 
@@ -92,7 +93,7 @@ export default function Signup() {
 
         <button
           type="submit"
-          className="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+          className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-700 transition"
         >
           Create Account
         </button>

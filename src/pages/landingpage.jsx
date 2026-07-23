@@ -2,24 +2,12 @@ import { useEffect, useState } from "react";
 import { supabase } from "../supabase/supabaseClient";
 import { Link } from "react-router-dom";
 import FetchThemes from "../components/fetchThemes";
+import Hero from "../assets/herobg.png";
+import SearchBoxWithFilters from "../components/searchBoxWithFilters";
 
 export default function Landingpage() {
   const [legoSets, setLegoSets] = useState([]);
-  {
-    /*featured sets */
-  }
-  const [searchTerm, setSearchTerm] = useState("");
-  {
-    /*search set*/
-  }
-  const [searchResults, setSearchResults] = useState([]);
-  {
-    /*search results*/
-  }
 
-  {
-    /*featured sets */
-  }
   useEffect(() => {
     async function loadSets() {
       const { data, error } = await supabase
@@ -32,118 +20,152 @@ export default function Landingpage() {
       if (error) {
         console.error("Error fetching sets: ", error);
       } else {
-        console.log("Fetched sets: ", data);
         setLegoSets(data);
       }
     }
     loadSets();
   }, []);
-  {
-    /*search set*/
-  }
-  async function handleSearch(e) {
-    const term = e.target.value;
-    setSearchTerm(term);
-
-    if (term.trim() === "") {
-      setSearchResults([]);
-      return;
-    }
-
-    const { data, error } = await supabase
-      .from("lego_sets")
-      .select("*")
-      .or(`set_name.ilike.%${term}%,set_number.ilike.%${term}%`)
-      .gt("stock", 0);
-    //search by name or set number
-
-    if (error) {
-      console.error("Error searching sets: ", error);
-    } else {
-      setSearchResults(data);
-    }
-  }
 
   return (
-    <section className="bg-white min-h-screen flex flex-col items-center justify-center px-6 py-16">
-      {/* Heading */}
-      <h1 className="text-3xl font-extrabold text-red-500 mb-6 text-center">
-        Explore our available themes and sets and start building your dream
-        collection!
-      </h1>
-      <p className="text-lg text-gray-700 mb-10 text-center max-w-2xl">
-        Search for your favorite LEGO set or choose a theme.
-      </p>
+    <section className="min-h-screen flex flex-col items-center justify-center">
+      {/* Hero Section */}
+      <div
+        data-aos="fade-up"
+        className="relative z-50 min-h-[80vh] w-full bg-cover bg-center flex flex-col items-start justify-center px-8"
+        style={{ backgroundImage: `url(${Hero})` }}
+      >
+        <div className="absolute inset-0 bg-black/30"></div>
 
-      <div className="flex flex-col items-center w-full md-10 gap-6">
-        {/* Search Box */}
-        <div className="w-full md:w-1/3 relative">
-          <input
-            type="text"
-            placeholder="Search for a set name or set number..."
-            value={searchTerm}
-            onChange={handleSearch}
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500"
-          />
+        <div className="relative z-10 max-w-3xl text-left text-white">
+          <h1
+            data-aos="fade-right"
+            className="text-4xl md:text-6xl font-extrabold mb-4"
+          >
+            Build Your Dream Collection. One Set at a Time.
+          </h1>
+          <p data-aos="fade-left" className="text-lg md:text-xl mb-6">
+            Explore our themes and sets and start building your dream LEGO®
+            collection today!
+          </p>
 
-          {searchResults.length > 0 && (
-            <ul className="absolute bg-white border border-gray-300 rounded-lg mt-1 shadow-lg z-10 w-full">
-              {searchResults.map((set) => (
-                <li
-                  key={set.set_id}
-                  onClick={() => {
-                    window.location.href = `/products/${set.slug}`;
-                  }}
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                >
-                  {set.set_name} ({set.set_number})
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+          {/* Modular Search + Filters */}
+          <div data-aos="zoom-in" className="w-full max-w-md relative">
+            <SearchBoxWithFilters onResults={setLegoSets} />
+          </div>
 
-        {/* Theme Options */}
-        <div className="flex-1">
-          <FetchThemes />
+          {/* Feature Icons */}
+          <div
+            data-aos="fade-up"
+            className="flex space-x-8 text-sm font-semibold mt-6"
+          >
+            <span>100% Authentic Sets</span>
+            <span>Curated Collections</span>
+            <span>Fast & Secure Shipping</span>
+          </div>
         </div>
       </div>
 
-      {/* Featured Sets */}
-      <div className="mt-10 w-full max-w-4xl">
-        <h2 className="text-2xl font-bold text-red-500 mb-6 self-center">
-          Featured Sets
+      {/* Introduction */}
+      <div
+        data-aos="fade-up"
+        className="py-10 px-6 rounded-lg shadow-md max-w-3xl mx-auto"
+      >
+        <h2 className="text-2xl font-bold text-blue-500 mb-6 text-center">
+          Rare & Retired LEGO Sets
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {legoSets.map((set) => (
-            <Link
-              key={set.set_id}
-              to={`/products/${set.slug}`}
-              className="bg-white shadow-md rounded-lg p-4 hover:scale-105 transform transition"
-            >
-              <div
-                key={set.set_id}
-                className="bg-white shadow-md rounded-lg p-4"
-              >
-                <img
-                  src={set.image_url}
-                  alt={set.set_name}
-                  className="w-full h-48 object-cover rounded-md mb-4"
-                />
-                <h3 className="text-lg font-semibold text-gray-800">
-                  {set.set_name}
-                </h3>
 
-                <p className="text-gray-600">Set Number: {set.set_number}</p>
-                <p className="text-gray-600">
-                  Release Year: {set.release_year}
-                </p>
-                <p className="text-gray-600">Price: R{set.price}</p>
-                <p className="text-gray-600">Stock: {set.stock}</p>
-              </div>
-            </Link>
-          ))}
+        <p className="text-lg text-gray-700 mb-4">
+          We sell rare retired LEGO sets. Whether you’re a collector or a
+          builder, we’ve got something for you.
+        </p>
+
+        <p className="text-gray-600 leading-relaxed">
+          <span className="font-bold">
+            All advertised LEGO sets are in their original boxes and in good
+            condition.
+          </span>{" "}
+          We also sell retired LEGO sets that have been built before. To ship
+          them safely, we carefully break them down and pack all pieces into
+          labeled plastic bags.
+        </p>
+
+        <p className="text-gray-600 leading-relaxed mt-4">
+          These pre‑built sets are not advertised, but there’s a good chance we
+          have the one you’re looking for. Contact us and we’ll let you know if
+          it’s available. Pre‑built sets are offered at a very{" "}
+          <span className="font-semibold text-green-600">generous price</span>!
+        </p>
+
+        <div className="mt-6 text-center">
+          <Link
+            to="/contact"
+            onClick={() => window.scrollTo(0, 0)}
+            className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold 
+                 hover:bg-blue-600 transition-colors shadow-md"
+          >
+            Contact Us
+          </Link>
         </div>
+      </div>
+
+      {/* Theme Options */}
+      <div data-aos="fade-up" className="w-full px-6 py-10">
+        <FetchThemes />
+      </div>
+
+      {/* Featured Sets Grid */}
+      <h2
+        data-aos="fade-up"
+        className="text-3xl font-bold text-black mb-10 text-center border-b-4 border-blue-500 inline-block"
+      >
+        Featured Products
+      </h2>
+      <div className="flex justify-center">
+        <Link
+          to="/products"
+          onClick={() => window.scrollTo(0, 0)}
+          className="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold 
+                 hover:bg-blue-600 transition-colors shadow-md mb-4"
+        >
+          View All Products
+        </Link>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto px-6">
+        {legoSets.map((set, index) => (
+          <Link
+            key={set.set_id}
+            to={`/products/${set.slug}`}
+            data-aos="fade-up"
+            data-aos-delay={index * 150} // staggered animation
+            className="bg-white border border-gray-200 shadow-md rounded-lg p-6 
+                 hover:shadow-xl hover:scale-105 transform transition"
+          >
+            <img
+              src={set.image_url}
+              alt={set.set_name}
+              className="w-full max-h-92 object-cover rounded-lg mb-4 shadow-sm"
+            />
+            <h3 className="text-xl font-bold text-gray-800 mb-2">
+              {set.set_name}
+            </h3>
+            <p className="text-sm text-gray-600 mb-1">
+              Theme:{" "}
+              <span className="font-semibold">{set.themes?.theme_name}</span>
+            </p>
+            <p className="text-sm text-gray-600 mb-1">
+              Set Number:{" "}
+              <span className="font-semibold">{set.set_number}</span>
+            </p>
+            <p className="text-sm text-gray-600 mb-1">
+              Release Year:{" "}
+              <span className="font-semibold">{set.release_year}</span>
+            </p>
+            <p className="text-sm text-gray-600 mb-1">
+              Stock: <span className="font-semibold">{set.stock}</span>
+            </p>
+            <p className="text-lg font-semibold text-blue-600">R{set.price}</p>
+          </Link>
+        ))}
       </div>
     </section>
   );

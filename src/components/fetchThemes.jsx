@@ -21,18 +21,27 @@ export default function ThemeNav() {
   }, []);
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
-      {themes.map((theme) => (
-        <Link
-          key={theme.theme_name}
-          to={`/products?theme=${encodeURIComponent(theme.theme_name)}`}
-          className="bg-white shadow-md rounded-lg p-6 text-center 
-             hover:bg-red-500 hover:text-white 
-             transition transform hover:scale-105 font-semibold"
-        >
-          {theme.theme_name}
-        </Link>
-      ))}
+    <div className="mt-2 text-center">
+      <h2 className="text-3xl font-bold text-black mb-10 text-center border-b-4 border-blue-500 inline-block relative">
+        View Themes
+      </h2>
+      {/* Scrollable Themes Row */}
+      <div
+        id="themesRow"
+        className="flex overflow-x-auto flex-nowrap space-x-4 pb-2 scrollbar-hide"
+      >
+        {themes.map((theme) => (
+          <Link
+            key={theme.theme_name}
+            to={`/products?theme=${encodeURIComponent(theme.theme_name)}`}
+            className="flex items-center justify-center min-w-35 px-6 py-3 rounded-lg 
+                       text-white font-semibold bg-blue-500 hover:bg-blue-600 
+                       transition transform hover:scale-105 shadow-md"
+          >
+            {theme.theme_name}
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }

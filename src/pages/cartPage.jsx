@@ -63,7 +63,9 @@ export default function CartPage({ user }) {
 
   return (
     <section className="p-8">
-      <h2 className="text-2xl font-bold mb-4">Your Cart</h2>
+      <h2 className="text-3xl font-bold text-black mb-10 text-center border-b-4 border-blue-500 inline-block">
+        Your Cart
+      </h2>
       {cartItems.length === 0 ? (
         <p>No items in cart.</p>
       ) : (
@@ -102,7 +104,7 @@ export default function CartPage({ user }) {
               </div>
               <button
                 onClick={() => removeItem(item.cart_id)}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
               >
                 Remove
               </button>
@@ -112,10 +114,12 @@ export default function CartPage({ user }) {
       )}
       {cartItems.length > 0 && (
         <div className="mt-6">
-          <p className="text-xl font-bold">Total: R{total}</p>
+          <p className="text-xl font-bold">
+            Total: <span className="text-blue-500">R{total}</span>
+          </p>
           <button
             onClick={buyNow}
-            className="mt-4 bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600"
+            className="mt-4 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600"
           >
             Buy Now
           </button>

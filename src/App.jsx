@@ -9,19 +9,26 @@ import Login from "./pages/login.jsx";
 import Products from "./pages/products.jsx";
 import Productspage from "./pages/productspage.jsx";
 import CartPage from "./pages/cartPage.jsx";
+import Contact from "./pages/contact.jsx";
+import Aos from "aos";
+import "aos/dist/aos.css";
 
 function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // ✅ Load current session
+    Aos.init({ duration: 800, once: true });
+  }, []);
+
+  useEffect(() => {
+    //Load current session
     async function loadSession() {
       const { data } = await supabase.auth.getSession();
       setUser(data.session?.user ?? null);
     }
     loadSession();
 
-    // ✅ Listen for login/logout changes
+    //Listen for login/logout changes
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setUser(session?.user ?? null);
@@ -44,6 +51,7 @@ function App() {
           <Route path="/products/:slug" element={<Products />} />
           <Route path="/products" element={<Productspage />} />
           <Route path="/cart" element={<CartPage user={user} />} />
+          <Route path="/contact" element={<Contact />} />
         </Routes>
       </MainLayout>
     </Router>

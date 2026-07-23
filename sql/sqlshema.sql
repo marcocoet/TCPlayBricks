@@ -26,3 +26,7 @@ create table cart (
   created_at timestamp default now()
 );
 
+--add slugs
+UPDATE lego_sets
+SET slug = lower(replace(set_name, ' ', '-'))
+WHERE slug IS NULL;

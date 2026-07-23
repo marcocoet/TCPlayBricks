@@ -1,10 +1,17 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { ShoppingCartIcon } from "@heroicons/react/24/outline";
+import { NavLink } from "react-router-dom";
+import {
+  ShoppingCartIcon,
+  Bars3Icon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 import { supabase } from "../supabase/supabaseClient";
+import { HomeIcon } from "@heroicons/react/16/solid";
+import Logo from "../assets/TC_PlayBricks_Logo.png";
 
 export default function Header({ user }) {
   const [profile, setProfile] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     async function loadProfile() {
@@ -35,60 +42,107 @@ export default function Header({ user }) {
   }
 
   return (
-    <header className="bg-white text-gray-800 p-4">
-      <nav className="container mx-auto flex justify-between items-center px-6 py-3">
+    <header className="bg-white text-gray-800 shadow-md">
+      <nav className="container mx-auto flex justify-between items-center px-3 py-2 sm:px-6 sm:py-3">
         {/* Logo */}
-        <h1 className="text-xl font-bold tracking-wide">
-          TC <span className="text-red-500">Play</span>Bricks
-        </h1>
+        <img
+          alt="Logo"
+          src={Logo}
+          className="h-full max-h-30 object-contain"
+          loading="lazy"
+        />
 
-        {/* Navigation */}
-        <div className="flex space-x-6 items-center">
-          <Link
+        {/* Hamburger (mobile only) */}
+        <button
+          className="sm:hidden p-2 rounded-md hover:bg-gray-100"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          {menuOpen ? (
+            <XMarkIcon className="h-6 w-6 text-gray-800" />
+          ) : (
+            <Bars3Icon className="h-6 w-6 text-gray-800" />
+          )}
+        </button>
+
+        {/* Navigation (desktop) */}
+        <div className="hidden sm:flex space-x-2 md:space-x-4 items-center">
+          <NavLink
             to="/"
-            className="hover:text-red-500 hover:scale-110 transition"
+            className={({ isActive }) =>
+              `flex items-center px-2 py-1 sm:px-4 sm:py-2 rounded-md font-semibold text-sm sm:text-base transition ${
+                isActive
+                  ? "bg-blue-500 text-white"
+                  : "bg-white text-gray-800 hover:bg-gray-100"
+              }`
+            }
           >
+            <HomeIcon className="h-4 w-4 mr-1 sm:h-5 sm:w-5" />
             Home
-          </Link>
-          <Link
+          </NavLink>
+
+          <NavLink
             to="/products"
-            className="hover:text-red-500 hover:scale-110 transition"
+            className={({ isActive }) =>
+              `px-2 py-1 sm:px-4 sm:py-2 rounded-md font-semibold text-sm sm:text-base transition ${
+                isActive
+                  ? "bg-blue-500 text-white"
+                  : "bg-white text-gray-800 hover:bg-gray-100"
+              }`
+            }
           >
             Products
-          </Link>
-          <Link
+          </NavLink>
+
+          <NavLink
             to="/contact"
-            className="hover:text-red-500 hover:scale-110 transition"
+            className={({ isActive }) =>
+              `px-2 py-1 sm:px-4 sm:py-2 rounded-md font-semibold text-sm sm:text-base transition ${
+                isActive
+                  ? "bg-blue-500 text-white"
+                  : "bg-white text-gray-800 hover:bg-gray-100"
+              }`
+            }
           >
             Contact
-          </Link>
+          </NavLink>
 
           {!user ? (
             <>
-              <Link
+              <NavLink
                 to="/signup"
-                className="hover:text-red-500 hover:scale-110 transition"
+                className={({ isActive }) =>
+                  `px-2 py-1 sm:px-4 sm:py-2 rounded-md font-semibold text-sm sm:text-base transition ${
+                    isActive
+                      ? "bg-blue-500 text-white"
+                      : "bg-white text-gray-800 hover:bg-gray-100"
+                  }`
+                }
               >
                 Sign Up
-              </Link>
-              <Link
+              </NavLink>
+              <NavLink
                 to="/login"
-                className="hover:text-red-500 hover:scale-110 transition"
+                className={({ isActive }) =>
+                  `px-2 py-1 sm:px-4 sm:py-2 rounded-md font-semibold text-sm sm:text-base transition ${
+                    isActive
+                      ? "bg-blue-500 text-white"
+                      : "bg-white text-gray-800 hover:bg-gray-100"
+                  }`
+                }
               >
                 Login
-              </Link>
+              </NavLink>
             </>
           ) : (
             <>
-              {/* Show email from profiles table */}
               {profile && (
-                <span className="text-gray-700 font-medium">
+                <span className="text-gray-700 font-bold text-sm sm:text-base">
                   {profile.email}
                 </span>
               )}
               <button
                 onClick={handleLogout}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+                className="px-2 py-1 sm:px-4 sm:py-2 rounded-md font-semibold text-white text-sm sm:text-base bg-blue-500 hover:opacity-90 transition"
               >
                 Logout
               </button>
@@ -96,14 +150,74 @@ export default function Header({ user }) {
           )}
 
           {/* ShoppingCart */}
-          <Link
-            to={user ? "/cart" : "/login"} // ✅ if not logged in → go to login
-            className="hover:text-red-500 hover:scale-110 transition"
+          <NavLink
+            to={user ? "/cart" : "/login"}
+            className="p-2 rounded-md hover:bg-gray-100 transition"
           >
-            <ShoppingCartIcon className="h-6 w-6" />
-          </Link>
+            <ShoppingCartIcon className="h-5 w-5 sm:h-6 sm:w-6 text-gray-800" />
+          </NavLink>
         </div>
       </nav>
+
+      {/* Mobile dropdown menu */}
+      {menuOpen && (
+        <div className="sm:hidden flex flex-col space-y-2 px-4 pb-4">
+          <NavLink
+            to="/"
+            className="px-4 py-2 rounded-md bg-blue-500 text-white"
+          >
+            Home
+          </NavLink>
+          <NavLink
+            to="/products"
+            className="px-4 py-2 rounded-md bg-blue-500 text-white"
+          >
+            Products
+          </NavLink>
+          <NavLink
+            to="/contact"
+            className="px-4 py-2 rounded-md bg-blue-500 text-white"
+          >
+            Contact
+          </NavLink>
+          {!user ? (
+            <>
+              <NavLink
+                to="/signup"
+                className="px-4 py-2 rounded-md bg-blue-500 text-white"
+              >
+                Sign Up
+              </NavLink>
+              <NavLink
+                to="/login"
+                className="px-4 py-2 rounded-md bg-blue-500 text-white"
+              >
+                Login
+              </NavLink>
+            </>
+          ) : (
+            <>
+              {profile && (
+                <span className="px-4 py-2 text-gray-700 font-bold">
+                  {profile.email}
+                </span>
+              )}
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 rounded-md font-semibold text-white bg-blue-500 hover:opacity-90 transition"
+              >
+                Logout
+              </button>
+            </>
+          )}
+          <NavLink
+            to={user ? "/cart" : "/login"}
+            className="px-4 py-2 rounded-md bg-blue-500 text-white"
+          >
+            Cart
+          </NavLink>
+        </div>
+      )}
     </header>
   );
 }

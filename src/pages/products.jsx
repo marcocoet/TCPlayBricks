@@ -118,6 +118,7 @@ export default function ProductPage() {
           <img
             src={setData.image_url}
             alt={setData.set_name}
+            data-aos="fade-up"
             className="w-full h-auto object-contain rounded-lg"
           />
         </div>
@@ -135,11 +136,14 @@ export default function ProductPage() {
             Release Year:{" "}
             <span className="font-semibold">{setData.release_year}</span>
           </p>
-          <p className="text-gray-600 mb-2">
-            Price: <span className="font-semibold">R{setData.price}</span>
-          </p>
+
           <p className="text-gray-600 mb-6">
             Stock: <span className="font-semibold">{setData.stock}</span>
+          </p>
+          <p className="text-gray-600 mb-2">
+            <span className="text-lg text-blue-500 font-semibold">
+              R{setData.price}
+            </span>
           </p>
           <div className="flex items-center space-x-2 mb-4">
             <button
@@ -164,7 +168,7 @@ export default function ProductPage() {
 
           {/* Call to Action */}
           <div className="flex flex-col space-y-1.5">
-            <button className="bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition">
+            <button className="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:scale-105">
               Buy it Now
             </button>
             <button
@@ -175,7 +179,7 @@ export default function ProductPage() {
                 }
                 handleAddToCart(setData, user.id, desiredQty);
               }}
-              className="bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition"
+              className="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:scale-105"
             >
               Add to Cart
             </button>
