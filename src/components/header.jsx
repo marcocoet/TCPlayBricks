@@ -8,11 +8,19 @@ import {
 import { supabase } from "../supabase/supabaseClient";
 import { HomeIcon } from "@heroicons/react/16/solid";
 import Logo from "../assets/TC_PlayBricks_Logo.png";
+import BrickButton from "./BrickButton";
 
-export default function Header({ user }) {
+// The site header/nav bar, shown on every page via MainLayout.
+// `user` is passed down from App.jsx so we know whether to show
+// Login/Sign Up or the logged-in user's email + Logout button.
+export default function Header({ user, cartCount = 0 }) {
+  // profile holds extra info about the logged-in user (their email, looked
+  // up from our own "profiles" table rather than the auth system directly).
   const [profile, setProfile] = useState(null);
+  // Whether the mobile hamburger dropdown menu is open.
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // Whenever `user` changes (login/logout), fetch that user's profile row.
   useEffect(() => {
     async function loadProfile() {
       if (user) {
@@ -20,7 +28,7 @@ export default function Header({ user }) {
           .from("profiles")
           .select("email")
           .eq("id", user.id)
-          .single();
+          .single(); // .single() expects exactly one row back
 
         if (!error) {
           setProfile(data);
@@ -32,6 +40,7 @@ export default function Header({ user }) {
     loadProfile();
   }, [user]);
 
+  // Signs the user out via Supabase, then hard-redirects to /login.
   async function handleLogout() {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -52,7 +61,8 @@ export default function Header({ user }) {
           loading="lazy"
         />
 
-        {/* Hamburger (mobile only) */}
+        {/* Hamburger (mobile only) - only visible below the `sm` breakpoint,
+            toggles the mobile dropdown menu further down this file. */}
         <button
           className="sm:hidden p-2 rounded-md hover:bg-gray-100"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -64,14 +74,16 @@ export default function Header({ user }) {
           )}
         </button>
 
-        {/* Navigation (desktop) */}
+        {/* Navigation (desktop) - hidden on mobile, shown from `sm` up.
+            Each NavLink's className is a function of isActive, so the
+            current page's link gets highlighted red automatically. */}
         <div className="hidden sm:flex space-x-2 md:space-x-4 items-center">
           <NavLink
             to="/"
             className={({ isActive }) =>
               `flex items-center px-2 py-1 sm:px-4 sm:py-2 rounded-md font-semibold text-sm sm:text-base transition ${
                 isActive
-                  ? "bg-blue-500 text-white"
+                  ? "bg-red-600 text-white"
                   : "bg-white text-gray-800 hover:bg-gray-100"
               }`
             }
@@ -85,7 +97,7 @@ export default function Header({ user }) {
             className={({ isActive }) =>
               `px-2 py-1 sm:px-4 sm:py-2 rounded-md font-semibold text-sm sm:text-base transition ${
                 isActive
-                  ? "bg-blue-500 text-white"
+                  ? "bg-red-600 text-white"
                   : "bg-white text-gray-800 hover:bg-gray-100"
               }`
             }
@@ -98,7 +110,7 @@ export default function Header({ user }) {
             className={({ isActive }) =>
               `px-2 py-1 sm:px-4 sm:py-2 rounded-md font-semibold text-sm sm:text-base transition ${
                 isActive
-                  ? "bg-blue-500 text-white"
+                  ? "bg-red-600 text-white"
                   : "bg-white text-gray-800 hover:bg-gray-100"
               }`
             }
@@ -106,6 +118,8 @@ export default function Header({ user }) {
             Contact
           </NavLink>
 
+          {/* Show Sign Up / Login when logged out, or the user's email +
+              Logout button when logged in. */}
           {!user ? (
             <>
               <NavLink
@@ -113,7 +127,7 @@ export default function Header({ user }) {
                 className={({ isActive }) =>
                   `px-2 py-1 sm:px-4 sm:py-2 rounded-md font-semibold text-sm sm:text-base transition ${
                     isActive
-                      ? "bg-blue-500 text-white"
+                      ? "bg-red-600 text-white"
                       : "bg-white text-gray-800 hover:bg-gray-100"
                   }`
                 }
@@ -125,7 +139,7 @@ export default function Header({ user }) {
                 className={({ isActive }) =>
                   `px-2 py-1 sm:px-4 sm:py-2 rounded-md font-semibold text-sm sm:text-base transition ${
                     isActive
-                      ? "bg-blue-500 text-white"
+                      ? "bg-red-600 text-white"
                       : "bg-white text-gray-800 hover:bg-gray-100"
                   }`
                 }
@@ -140,43 +154,45 @@ export default function Header({ user }) {
                   {profile.email}
                 </span>
               )}
-              <button
-                onClick={handleLogout}
-                className="px-2 py-1 sm:px-4 sm:py-2 rounded-md font-semibold text-white text-sm sm:text-base bg-blue-500 hover:opacity-90 transition"
-              >
-                Logout
-              </button>
+              <BrickButton onClick={handleLogout}>Logout</BrickButton>
             </>
           )}
 
-          {/* ShoppingCart */}
+          {/* ShoppingCart - if not logged in, send them to /login instead
+              of /cart (the cart page needs a user to load their items). */}
           <NavLink
             to={user ? "/cart" : "/login"}
-            className="p-2 rounded-md hover:bg-gray-100 transition"
+            className="relative p-2 rounded-md hover:bg-gray-100 transition"
           >
             <ShoppingCartIcon className="h-5 w-5 sm:h-6 sm:w-6 text-gray-800" />
+            {cartCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex items-center justify-center h-5 w-5 rounded-full bg-red-600 text-white text-xs font-bold">
+                {cartCount > 9 ? "9+" : cartCount}
+              </span>
+            )}
           </NavLink>
         </div>
       </nav>
 
-      {/* Mobile dropdown menu */}
+      {/* Mobile dropdown menu - same links as above, stacked vertically,
+          only rendered when the hamburger button has toggled menuOpen on. */}
       {menuOpen && (
         <div className="sm:hidden flex flex-col space-y-2 px-4 pb-4">
           <NavLink
             to="/"
-            className="px-4 py-2 rounded-md bg-blue-500 text-white"
+            className="px-4 py-2 rounded-md bg-red-600 text-white"
           >
             Home
           </NavLink>
           <NavLink
             to="/products"
-            className="px-4 py-2 rounded-md bg-blue-500 text-white"
+            className="px-4 py-2 rounded-md bg-red-600 text-white"
           >
             Products
           </NavLink>
           <NavLink
             to="/contact"
-            className="px-4 py-2 rounded-md bg-blue-500 text-white"
+            className="px-4 py-2 rounded-md bg-red-600 text-white"
           >
             Contact
           </NavLink>
@@ -184,13 +200,13 @@ export default function Header({ user }) {
             <>
               <NavLink
                 to="/signup"
-                className="px-4 py-2 rounded-md bg-blue-500 text-white"
+                className="px-4 py-2 rounded-md bg-red-600 text-white"
               >
                 Sign Up
               </NavLink>
               <NavLink
                 to="/login"
-                className="px-4 py-2 rounded-md bg-blue-500 text-white"
+                className="px-4 py-2 rounded-md bg-red-600 text-white"
               >
                 Login
               </NavLink>
@@ -202,19 +218,16 @@ export default function Header({ user }) {
                   {profile.email}
                 </span>
               )}
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 rounded-md font-semibold text-white bg-blue-500 hover:opacity-90 transition"
-              >
+              <BrickButton onClick={handleLogout} className="w-full">
                 Logout
-              </button>
+              </BrickButton>
             </>
           )}
           <NavLink
             to={user ? "/cart" : "/login"}
-            className="px-4 py-2 rounded-md bg-blue-500 text-white"
+            className="px-4 py-2 rounded-md bg-red-600 text-white"
           >
-            Cart
+            Cart{cartCount > 0 ? ` (${cartCount})` : ""}
           </NavLink>
         </div>
       )}

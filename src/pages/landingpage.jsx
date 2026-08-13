@@ -1,34 +1,50 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabase/supabaseClient";
 import { Link } from "react-router-dom";
+import {
+  CheckBadgeIcon,
+  Squares2X2Icon,
+  TruckIcon,
+} from "@heroicons/react/24/outline";
 import FetchThemes from "../components/fetchThemes";
+import BrickButton from "../components/BrickButton";
+import Spinner from "../components/Spinner";
 import Hero from "../assets/herobg.png";
 import SearchBoxWithFilters from "../components/searchBoxWithFilters";
 
+// The home page ("/"): hero banner + search, an intro blurb, the theme
+// button row, and a small grid of featured/recent sets.
 export default function Landingpage() {
   const [legoSets, setLegoSets] = useState([]);
+  // True until the initial fetch finishes, so we can show a spinner
+  // instead of a briefly-empty grid.
+  const [loadingSets, setLoadingSets] = useState(true);
 
+  // On page load, fetch the 5 newest in-stock sets to show in the
+  // "Featured Products" grid further down the page.
   useEffect(() => {
     async function loadSets() {
       const { data, error } = await supabase
         .from("lego_sets")
         .select("*")
-        .limit(5)
-        .gt("stock", 0)
-        .order("release_year", { ascending: false });
+        .limit(7)
+        .gt("stock", 0) // only sets that are actually in stock
+        .order("release_year", { ascending: false }); // newest first
 
       if (error) {
         console.error("Error fetching sets: ", error);
       } else {
         setLegoSets(data);
       }
+      setLoadingSets(false);
     }
     loadSets();
   }, []);
 
   return (
     <section className="min-h-screen flex flex-col items-center justify-center">
-      {/* Hero Section */}
+      {/* Hero Section - full-width background image with a dark overlay
+          so the white text stays readable on top of it. */}
       <div
         data-aos="fade-up"
         className="relative z-50 min-h-[80vh] w-full bg-cover bg-center flex flex-col items-start justify-center px-8"
@@ -48,29 +64,40 @@ export default function Landingpage() {
             collection today!
           </p>
 
-          {/* Modular Search + Filters */}
+          {/* Modular Search + Filters - passing setLegoSets as onResults
+              means typing a search here replaces the "Featured Products"
+              grid below with the matching sets. */}
           <div data-aos="zoom-in" className="w-full max-w-md relative">
             <SearchBoxWithFilters onResults={setLegoSets} />
           </div>
 
-          {/* Feature Icons */}
+          {/* Feature Icons - just decorative trust badges, no logic here. */}
           <div
             data-aos="fade-up"
-            className="flex space-x-8 text-sm font-semibold mt-6"
+            className="flex flex-wrap gap-x-8 gap-y-2 text-sm font-semibold mt-6"
           >
-            <span>100% Authentic Sets</span>
-            <span>Curated Collections</span>
-            <span>Fast & Secure Shipping</span>
+            <span className="flex items-center gap-2">
+              <CheckBadgeIcon className="h-5 w-5" />
+              100% Authentic Sets
+            </span>
+            <span className="flex items-center gap-2">
+              <Squares2X2Icon className="h-5 w-5" />
+              Curated Collections
+            </span>
+            <span className="flex items-center gap-2">
+              <TruckIcon className="h-5 w-5" />
+              Fast & Secure Shipping
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Introduction */}
+      {/* Introduction - static marketing copy about the store. */}
       <div
         data-aos="fade-up"
         className="py-10 px-6 rounded-lg shadow-md max-w-3xl mx-auto"
       >
-        <h2 className="text-2xl font-bold text-blue-500 mb-6 text-center">
+        <h2 className="text-2xl font-bold text-red-600 mb-6 text-center">
           Rare & Retired LEGO Sets
         </h2>
 
@@ -97,39 +124,46 @@ export default function Landingpage() {
         </p>
 
         <div className="mt-6 text-center">
-          <Link
+          <BrickButton
             to="/contact"
+            size="lg"
             onClick={() => window.scrollTo(0, 0)}
-            className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold 
-                 hover:bg-blue-600 transition-colors shadow-md"
           >
             Contact Us
-          </Link>
+          </BrickButton>
         </div>
       </div>
 
-      {/* Theme Options */}
+      {/* Theme Options - the horizontally-scrolling colored buttons
+          (Star Wars, Friends, ...), each one links to /products?theme=X */}
       <div data-aos="fade-up" className="w-full px-6 py-10">
         <FetchThemes />
       </div>
 
-      {/* Featured Sets Grid */}
+      {/* Featured Sets Grid - shows whatever's currently in `legoSets`:
+          either the 5 newest sets from the initial fetch, or search
+          results if the visitor used the search box above. */}
       <h2
         data-aos="fade-up"
-        className="text-3xl font-bold text-black mb-10 text-center border-b-4 border-blue-500 inline-block"
+        className="text-3xl font-bold text-black mb-10 text-center border-b-4 border-red-600 inline-block"
       >
         Featured Products
       </h2>
       <div className="flex justify-center">
-        <Link
+        <BrickButton
           to="/products"
+          size="lg"
+          className="mb-4"
           onClick={() => window.scrollTo(0, 0)}
-          className="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold 
-                 hover:bg-blue-600 transition-colors shadow-md mb-4"
         >
           View All Products
-        </Link>
+        </BrickButton>
       </div>
+      {loadingSets ? (
+        <div className="flex justify-center py-16">
+          <Spinner />
+        </div>
+      ) : (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto px-6">
         {legoSets.map((set, index) => (
           <Link
@@ -137,14 +171,18 @@ export default function Landingpage() {
             to={`/products/${set.slug}`}
             data-aos="fade-up"
             data-aos-delay={index * 150} // staggered animation
-            className="bg-white border border-gray-200 shadow-md rounded-lg p-6 
+            className="bg-white border border-gray-200 shadow-md rounded-lg p-6
                  hover:shadow-xl hover:scale-105 transform transition"
           >
-            <img
-              src={set.image_url}
-              alt={set.set_name}
-              className="w-full max-h-92 object-cover rounded-lg mb-4 shadow-sm"
-            />
+            {/* Fixed-height image box + object-contain so every product
+                photo lines up the same regardless of its original size. */}
+            <div className="w-full h-56 flex items-center justify-center bg-gray-50 rounded-lg mb-4 overflow-hidden shadow-sm">
+              <img
+                src={set.image_url}
+                alt={set.set_name}
+                className="max-w-full max-h-full object-contain"
+              />
+            </div>
             <h3 className="text-xl font-bold text-gray-800 mb-2">
               {set.set_name}
             </h3>
@@ -163,10 +201,11 @@ export default function Landingpage() {
             <p className="text-sm text-gray-600 mb-1">
               Stock: <span className="font-semibold">{set.stock}</span>
             </p>
-            <p className="text-lg font-semibold text-blue-600">R{set.price}</p>
+            <p className="text-lg font-semibold text-red-600">R{set.price}</p>
           </Link>
         ))}
       </div>
+      )}
     </section>
   );
 }

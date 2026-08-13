@@ -1,3 +1,4 @@
+// Simple site footer shown at the bottom of every page via MainLayout.
 export default function footer() {
   return (
     <footer className=" text-white p-4 mt-8">
