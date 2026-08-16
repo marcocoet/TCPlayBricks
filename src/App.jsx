@@ -12,6 +12,8 @@ import Products from "./pages/products.jsx";
 import Productspage from "./pages/productspage.jsx";
 import CartPage from "./pages/cartPage.jsx";
 import Contact from "./pages/contact.jsx";
+import Terms from "./pages/terms.jsx";
+import Privacy from "./pages/privacy.jsx";
 import OrderSuccess from "./pages/orderSuccess.jsx";
 import OrderCancelled from "./pages/orderCancelled.jsx";
 import Aos from "aos";
@@ -112,6 +114,8 @@ function App() {
             }
           />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
           <Route path="/order-success" element={<OrderSuccess />} />
           <Route path="/order-cancelled" element={<OrderCancelled />} />
         </Routes>
