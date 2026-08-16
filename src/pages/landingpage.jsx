@@ -9,7 +9,7 @@ import {
 import FetchThemes from "../components/fetchThemes";
 import BrickButton from "../components/BrickButton";
 import Spinner from "../components/Spinner";
-import Hero from "../assets/herobg.png";
+import Hero from "../assets/herobg.webp";
 import SearchBoxWithFilters from "../components/searchBoxWithFilters";
 
 // The home page ("/"): hero banner + search, an intro blurb, the theme
@@ -67,7 +67,7 @@ export default function Landingpage() {
           {/* Modular Search + Filters - passing setLegoSets as onResults
               means typing a search here replaces the "Featured Products"
               grid below with the matching sets. */}
-          <div data-aos="zoom-in" className="w-full max-w-md relative">
+          <div data-aos="zoom-in" className="w-full max-w-md relative z-20">
             <SearchBoxWithFilters onResults={setLegoSets} />
           </div>
 
@@ -180,6 +180,8 @@ export default function Landingpage() {
               <img
                 src={set.image_url}
                 alt={set.set_name}
+                loading="lazy"
+                decoding="async"
                 className="max-w-full max-h-full object-contain"
               />
             </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   ShoppingCartIcon,
   Bars3Icon,
@@ -7,7 +7,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { supabase } from "../supabase/supabaseClient";
 import { HomeIcon } from "@heroicons/react/16/solid";
-import Logo from "../assets/TC_PlayBricks_Logo.png";
+import Logo from "../assets/TC_PlayBricks_Logo.webp";
 import BrickButton from "./BrickButton";
 
 // The site header/nav bar, shown on every page via MainLayout.
@@ -19,6 +19,7 @@ export default function Header({ user, cartCount = 0 }) {
   const [profile, setProfile] = useState(null);
   // Whether the mobile hamburger dropdown menu is open.
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   // Whenever `user` changes (login/logout), fetch that user's profile row.
   useEffect(() => {
@@ -40,13 +41,14 @@ export default function Header({ user, cartCount = 0 }) {
     loadProfile();
   }, [user]);
 
-  // Signs the user out via Supabase, then hard-redirects to /login.
+  // Signs the user out via Supabase, then navigates to /login client-side
+  // (avoids a full page reload hitting the host as a hard navigation).
   async function handleLogout() {
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.error("Error logging out:", error);
     } else {
-      window.location.href = "/login";
+      navigate("/login");
     }
   }
 
@@ -180,18 +182,21 @@ export default function Header({ user, cartCount = 0 }) {
         <div className="sm:hidden flex flex-col space-y-2 px-4 pb-4">
           <NavLink
             to="/"
+            onClick={() => setMenuOpen(false)}
             className="px-4 py-2 rounded-md bg-red-600 text-white"
           >
             Home
           </NavLink>
           <NavLink
             to="/products"
+            onClick={() => setMenuOpen(false)}
             className="px-4 py-2 rounded-md bg-red-600 text-white"
           >
             Products
           </NavLink>
           <NavLink
             to="/contact"
+            onClick={() => setMenuOpen(false)}
             className="px-4 py-2 rounded-md bg-red-600 text-white"
           >
             Contact
@@ -200,12 +205,14 @@ export default function Header({ user, cartCount = 0 }) {
             <>
               <NavLink
                 to="/signup"
+                onClick={() => setMenuOpen(false)}
                 className="px-4 py-2 rounded-md bg-red-600 text-white"
               >
                 Sign Up
               </NavLink>
               <NavLink
                 to="/login"
+                onClick={() => setMenuOpen(false)}
                 className="px-4 py-2 rounded-md bg-red-600 text-white"
               >
                 Login
@@ -218,13 +225,20 @@ export default function Header({ user, cartCount = 0 }) {
                   {profile.email}
                 </span>
               )}
-              <BrickButton onClick={handleLogout} className="w-full">
+              <BrickButton
+                onClick={() => {
+                  setMenuOpen(false);
+                  handleLogout();
+                }}
+                className="w-full"
+              >
                 Logout
               </BrickButton>
             </>
           )}
           <NavLink
             to={user ? "/cart" : "/login"}
+            onClick={() => setMenuOpen(false)}
             className="px-4 py-2 rounded-md bg-red-600 text-white"
           >
             Cart{cartCount > 0 ? ` (${cartCount})` : ""}

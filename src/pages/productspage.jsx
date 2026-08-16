@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "../supabase/supabaseClient";
 import { Link, useLocation } from "react-router-dom";
 import FetchThemes from "../components/fetchThemes";
@@ -21,6 +21,11 @@ export default function Products() {
   // Extract ?theme=XYZ
   const params = new URLSearchParams(location.search);
   const themeName = params.get("theme"); // null if there's no ?theme= in the URL
+
+  // Points at the results heading, so a theme-filtered visit (e.g. from
+  // pressing Enter on a theme search) can scroll straight to the sets
+  // instead of leaving the visitor stuck above the search/theme-row hero.
+  const resultsRef = useRef(null);
 
   // Load sets - re-runs whenever `themeName` changes (e.g. clicking a
   // different theme button while already on this page).
@@ -59,6 +64,13 @@ export default function Products() {
         setLegoSets(data);
       }
       setLoadingSets(false);
+
+      if (themeName) {
+        resultsRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
     }
     loadSets();
   }, [themeName]);
@@ -89,8 +101,9 @@ export default function Products() {
       {/* Sets Grid - heading changes depending on whether a theme filter
           is active. */}
       <h2
+        ref={resultsRef}
         data-aos="fade-up"
-        className="text-3xl font-bold text-black mb-10 text-center border-b-4 border-red-600 inline-block"
+        className="text-3xl font-bold text-black mb-10 text-center border-b-4 border-red-600 inline-block scroll-mt-24"
       >
         {themeName ? `${themeName} Sets` : "All LEGO Sets"}
       </h2>
@@ -117,6 +130,8 @@ export default function Products() {
               <img
                 src={set.image_url}
                 alt={set.set_name}
+                loading="lazy"
+                decoding="async"
                 className="max-w-full max-h-full object-contain"
               />
             </div>

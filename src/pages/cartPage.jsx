@@ -249,6 +249,8 @@ export default function CartPage({ user, refreshCartCount }) {
                     <img
                       src={item.lego_sets.image_url}
                       alt={item.lego_sets.set_name}
+                      loading="lazy"
+                      decoding="async"
                       className="max-w-full max-h-full object-contain"
                     />
                   </div>
