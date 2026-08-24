@@ -118,6 +118,22 @@ Deno.serve(async (req) => {
 
     if (newStatus === "paid") {
       await adminClient.from("cart").delete().eq("user_id", sale.user_id);
+
+      // Now that the sale is paid, take the sold quantities off the shelf.
+      const { data: soldItems } = await adminClient
+        .from("sale_items")
+        .select("set_id, quantity")
+        .eq("sale_id", sale.sale_id);
+
+      for (const item of soldItems ?? []) {
+        const { error: stockError } = await adminClient.rpc("decrement_stock", {
+          p_set_id: item.set_id,
+          p_qty: item.quantity,
+        });
+        if (stockError) {
+          console.error("Stock decrement failed:", stockError);
+        }
+      }
     }
 
     return new Response("ok", { status: 200 });
