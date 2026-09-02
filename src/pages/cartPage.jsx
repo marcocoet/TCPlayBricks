@@ -331,7 +331,23 @@ export default function CartPage({ user, refreshCartCount }) {
               </div>
 
               {/* Delivery locker - we ship via PUDO parcel lockers, so we
-                  need to know which one to send the order to. */}
+                  need to know which one to send the order to.
+
+                  There's no reliable way to look this up for the buyer
+                  automatically right now (PUDO's own locker-locations API
+                  is unofficial/bot-blocked, see git history on this file),
+                  so it's a free-text field with a link out to PUDO's own
+                  finder. Steps we tell buyers, in short:
+                    1. Search "PUDO" on Google/Apple Maps (or use the "Find
+                       your nearest locker" link below).
+                    2. Find the locker nearest to them.
+                    3. Copy that location's name (and suburb, if the name
+                       alone isn't unique) into the field below.
+
+                  TODO: if a Google Maps Places API key is ever added
+                  (billing-enabled GCP project, see conversation with
+                  Claude), this could become a real address search +
+                  nearby-locker list instead of a free-text field. */}
               <label className="block mb-4">
                 <span className="flex items-center justify-between mb-1">
                   <span className="text-sm font-semibold text-gray-700">
