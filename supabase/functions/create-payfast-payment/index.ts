@@ -71,9 +71,6 @@ function generateSignature(fields: Record<string, string>, passphrase: string | 
   if (passphrase) {
     getString += `&passphrase=${phpStyleEncode(passphrase.trim())}`;
   }
-  // Temporary: log the exact string being hashed, so we can compare it
-  // byte-for-byte against PayFast's own calculation if this still fails.
-  console.log("PayFast signature source string:", getString);
   return createHash("md5").update(getString).digest("hex");
 }
 
