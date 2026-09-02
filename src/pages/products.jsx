@@ -1,21 +1,21 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { supabase } from "../supabase/supabaseClient";
 import BrickButton from "../components/BrickButton";
 import Spinner from "../components/Spinner";
-import { startPayfastCheckout } from "../utils/payfastCheckout";
 
 // The single-product detail page, e.g. "/products/batmobile-tumbler".
 // Shows one set's photo/details and handles adding it to the cart.
 export default function ProductPage({ refreshCartCount }) {
   // useParams() reads the ":slug" part of the route path defined in App.jsx.
   const { slug } = useParams();
+  const navigate = useNavigate();
   const [setData, setSetData] = useState(null); // the product itself, once loaded
   const [user, setUser] = useState(null); // logged-in user (needed to add to cart)
   const [desiredQty, setDesiredQty] = useState(1); // quantity picker value
-  // Whether "Buy it Now" is in flight (adding to cart + redirecting to
-  // PayFast) - same idea as the cart page's isRedirecting.
+  // Whether "Buy it Now" is in flight (adding to cart, then navigating to
+  // /cart) - same idea as the cart page's isRedirecting.
   const [isRedirecting, setIsRedirecting] = useState(false);
   // Every in-stock set's slug, in the same newest-first order as the main
   // products grid - lets the prev/next arrows step through sets without
@@ -177,9 +177,10 @@ export default function ProductPage({ refreshCartCount }) {
     }
   }
 
-  // "Buy it Now": adds the selected quantity to the cart, then immediately
-  // sends the browser to PayFast checkout for the whole cart (same
-  // redirect the cart page's "Buy Now" uses).
+  // "Buy it Now": adds the selected quantity to the cart, then sends the
+  // browser to the cart page to finish checking out. It goes through the
+  // cart page (rather than straight to PayFast) because checkout needs the
+  // buyer's PUDO locker, which is only collected there.
   async function handleBuyItNow() {
     if (!user) {
       window.location.href = "/login";
@@ -194,13 +195,7 @@ export default function ProductPage({ refreshCartCount }) {
       setIsRedirecting(false);
       return;
     }
-    try {
-      await startPayfastCheckout();
-    } catch (error) {
-      console.error("Error starting checkout:", error);
-      alert("Something went wrong starting checkout. Please try again.");
-      setIsRedirecting(false);
-    }
+    navigate("/cart");
   }
 
   const arrowButtonClasses =
@@ -310,7 +305,7 @@ export default function ProductPage({ refreshCartCount }) {
               {isRedirecting ? (
                 <>
                   <Spinner size="h-4 w-4" className="mr-2 border-2" />
-                  Redirecting to PayFast...
+                  Adding to cart...
                 </>
               ) : (
                 "Buy it Now"

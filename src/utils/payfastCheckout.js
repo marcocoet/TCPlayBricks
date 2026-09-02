@@ -3,12 +3,13 @@ import { supabase } from "../supabase/supabaseClient";
 // Starts PayFast checkout for whatever's currently in the logged-in user's
 // cart: calls the create-payfast-payment Edge Function (which reads the
 // cart itself server-side), then builds and submits a hidden form to
-// redirect the browser to PayFast's hosted checkout page. Used by both the
-// cart page's "Buy Now" and a product page's "Buy it Now" (which adds the
-// item to the cart first, then calls this the same way).
-export async function startPayfastCheckout() {
+// redirect the browser to PayFast's hosted checkout page. `pudoLocker` is
+// the buyer's chosen delivery locker - required, since that's the only
+// place we know where to actually ship the order.
+export async function startPayfastCheckout(pudoLocker) {
   const { data, error } = await supabase.functions.invoke(
     "create-payfast-payment",
+    { body: { pudoLocker } },
   );
   if (error) throw error;
 

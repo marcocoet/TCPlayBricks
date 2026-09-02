@@ -107,6 +107,16 @@ Deno.serve(async (req) => {
       });
     }
 
+    // The buyer's chosen PUDO locker - required, since it's the only place
+    // we know where to actually ship the order to.
+    const { pudoLocker } = await req.json().catch(() => ({}));
+    if (!pudoLocker || !String(pudoLocker).trim()) {
+      return new Response(JSON.stringify({ error: "Please choose a PUDO locker" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Load this user's cart fresh from the database - never trust an
     // amount the client might send us.
     const { data: cartItems, error: cartError } = await adminClient
@@ -147,6 +157,7 @@ Deno.serve(async (req) => {
         total,
         status: "pending",
         payment_id: paymentId,
+        pudo_locker: String(pudoLocker).trim(),
       })
       .select()
       .single();

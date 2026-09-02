@@ -16,6 +16,10 @@ export default function CartPage({ user, refreshCartCount }) {
   // Whether buyNow() is in flight - covers the brief gap between clicking
   // Buy Now and the browser actually navigating off to PayFast.
   const [isRedirecting, setIsRedirecting] = useState(false);
+  // The buyer's nearest/preferred PUDO locker, typed in by hand (looked up
+  // by the buyer themselves on PUDO's own app/site) - required at checkout
+  // since it's the only way we know where to ship the order.
+  const [pudoLocker, setPudoLocker] = useState("");
 
   // Calculate total price
   // Adds up (price * quantity) for every line in the cart.
@@ -191,9 +195,13 @@ export default function CartPage({ user, refreshCartCount }) {
   // true on success on purpose - the page is about to navigate away, so
   // there's no "done" state to reset.
   async function buyNow() {
+    if (!pudoLocker.trim()) {
+      alert("Please enter your nearest PUDO locker before checking out.");
+      return;
+    }
     setIsRedirecting(true);
     try {
-      await startPayfastCheckout();
+      await startPayfastCheckout(pudoLocker.trim());
     } catch (error) {
       console.error("Error during checkout:", error);
       alert("Something went wrong starting checkout. Please try again.");
@@ -321,12 +329,31 @@ export default function CartPage({ user, refreshCartCount }) {
                 <span>Total</span>
                 <span className="text-red-600">R{total}</span>
               </div>
+
+              {/* Delivery locker - we ship via PUDO parcel lockers, so we
+                  need to know which one to send the order to. Look up
+                  yours on PUDO's app/site (pudo.co.za) if you're not sure. */}
+              <label className="block mb-4">
+                <span className="block text-sm font-semibold text-gray-700 mb-1">
+                  Nearest PUDO Locker
+                </span>
+                <input
+                  type="text"
+                  placeholder="e.g. PUDO Locker - Clearwater Mall"
+                  value={pudoLocker}
+                  onChange={(e) => setPudoLocker(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white shadow-sm
+                         focus:outline-none focus:ring-2 focus:ring-red-500 text-sm
+                         placeholder:text-gray-500"
+                />
+              </label>
+
               <BrickButton
                 onClick={buyNow}
                 variant="green"
                 size="lg"
                 className="w-full"
-                disabled={isRedirecting}
+                disabled={isRedirecting || !pudoLocker.trim()}
               >
                 {isRedirecting ? (
                   <>
