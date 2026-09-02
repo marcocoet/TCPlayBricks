@@ -107,11 +107,17 @@ Deno.serve(async (req) => {
       });
     }
 
-    // The buyer's chosen PUDO locker - required, since it's the only place
-    // we know where to actually ship the order to.
-    const { pudoLocker } = await req.json().catch(() => ({}));
+    // The buyer's chosen PUDO locker and mobile number - both required.
+    // PUDO needs a locker to ship to and a contact number for the buyer.
+    const { pudoLocker, phoneNumber } = await req.json().catch(() => ({}));
     if (!pudoLocker || !String(pudoLocker).trim()) {
       return new Response(JSON.stringify({ error: "Please choose a PUDO locker" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (!phoneNumber || !String(phoneNumber).trim()) {
+      return new Response(JSON.stringify({ error: "Please enter your mobile number" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -158,6 +164,7 @@ Deno.serve(async (req) => {
         status: "pending",
         payment_id: paymentId,
         pudo_locker: String(pudoLocker).trim(),
+        phone_number: String(phoneNumber).trim(),
       })
       .select()
       .single();
@@ -187,6 +194,7 @@ Deno.serve(async (req) => {
       cancel_url: `${siteUrl}/order-cancelled`,
       notify_url: `${functionsUrl}/payfast-notify`,
       email_address: user.email ?? "",
+      cell_number: String(phoneNumber).trim(),
       m_payment_id: paymentId,
       amount: total.toFixed(2),
       item_name: `TC PlayBricks order (${cartItems.length} item${cartItems.length > 1 ? "s" : ""})`,

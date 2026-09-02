@@ -4,12 +4,12 @@ import { supabase } from "../supabase/supabaseClient";
 // cart: calls the create-payfast-payment Edge Function (which reads the
 // cart itself server-side), then builds and submits a hidden form to
 // redirect the browser to PayFast's hosted checkout page. `pudoLocker` is
-// the buyer's chosen delivery locker - required, since that's the only
-// place we know where to actually ship the order.
-export async function startPayfastCheckout(pudoLocker) {
+// the buyer's chosen delivery locker, and `phoneNumber` their mobile number
+// - both required, since PUDO needs a locker and a contact number to ship.
+export async function startPayfastCheckout(pudoLocker, phoneNumber) {
   const { data, error } = await supabase.functions.invoke(
     "create-payfast-payment",
-    { body: { pudoLocker } },
+    { body: { pudoLocker, phoneNumber } },
   );
   if (error) throw error;
 

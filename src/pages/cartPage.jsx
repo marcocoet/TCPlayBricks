@@ -20,6 +20,9 @@ export default function CartPage({ user, refreshCartCount }) {
   // by the buyer themselves on PUDO's own app/site) - required at checkout
   // since it's the only way we know where to ship the order.
   const [pudoLocker, setPudoLocker] = useState("");
+  // The buyer's mobile number - PUDO requires a contact number for the
+  // recipient of every shipment, so this is required too.
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   // Calculate total price
   // Adds up (price * quantity) for every line in the cart.
@@ -199,9 +202,13 @@ export default function CartPage({ user, refreshCartCount }) {
       alert("Please enter your nearest PUDO locker before checking out.");
       return;
     }
+    if (!phoneNumber.trim()) {
+      alert("Please enter your mobile number before checking out.");
+      return;
+    }
     setIsRedirecting(true);
     try {
-      await startPayfastCheckout(pudoLocker.trim());
+      await startPayfastCheckout(pudoLocker.trim(), phoneNumber.trim());
     } catch (error) {
       console.error("Error during checkout:", error);
       alert("Something went wrong starting checkout. Please try again.");
@@ -363,12 +370,29 @@ export default function CartPage({ user, refreshCartCount }) {
                 />
               </label>
 
+              {/* Mobile number - PUDO requires a contact number for the
+                  recipient on every shipment. */}
+              <label className="block mb-4">
+                <span className="block text-sm font-semibold text-gray-700 mb-1">
+                  Mobile Number
+                </span>
+                <input
+                  type="tel"
+                  placeholder="e.g. 082 123 4567"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white shadow-sm
+                         focus:outline-none focus:ring-2 focus:ring-red-500 text-sm
+                         placeholder:text-gray-500"
+                />
+              </label>
+
               <BrickButton
                 onClick={buyNow}
                 variant="green"
                 size="lg"
                 className="w-full"
-                disabled={isRedirecting || !pudoLocker.trim()}
+                disabled={isRedirecting || !pudoLocker.trim() || !phoneNumber.trim()}
               >
                 {isRedirecting ? (
                   <>
