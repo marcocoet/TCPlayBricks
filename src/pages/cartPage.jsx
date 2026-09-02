@@ -331,11 +331,20 @@ export default function CartPage({ user, refreshCartCount }) {
               </div>
 
               {/* Delivery locker - we ship via PUDO parcel lockers, so we
-                  need to know which one to send the order to. Look up
-                  yours on PUDO's app/site (pudo.co.za) if you're not sure. */}
+                  need to know which one to send the order to. */}
               <label className="block mb-4">
-                <span className="block text-sm font-semibold text-gray-700 mb-1">
-                  Nearest PUDO Locker
+                <span className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-semibold text-gray-700">
+                    Nearest PUDO Locker
+                  </span>
+                  <a
+                    href="https://www.pudo.co.za/where-to-find-us.php"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-semibold text-red-600 hover:underline"
+                  >
+                    Find your nearest locker &rarr;
+                  </a>
                 </span>
                 <input
                   type="text"
