@@ -336,32 +336,22 @@ export default function CartPage({ user, refreshCartCount }) {
                   There's no reliable way to look this up for the buyer
                   automatically right now (PUDO's own locker-locations API
                   is unofficial/bot-blocked, see git history on this file),
-                  so it's a free-text field with a link out to PUDO's own
-                  finder. Steps we tell buyers, in short:
-                    1. Search "PUDO" on Google/Apple Maps (or use the "Find
-                       your nearest locker" link below).
-                    2. Find the locker nearest to them.
-                    3. Copy that location's name (and suburb, if the name
-                       alone isn't unique) into the field below.
+                  so it's a free-text field with on-page instructions
+                  instead of a link out to PUDO's site.
 
                   TODO: if a Google Maps Places API key is ever added
                   (billing-enabled GCP project, see conversation with
                   Claude), this could become a real address search +
                   nearby-locker list instead of a free-text field. */}
               <label className="block mb-4">
-                <span className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-semibold text-gray-700">
-                    Nearest PUDO Locker
-                  </span>
-                  <a
-                    href="https://www.pudo.co.za/where-to-find-us.php"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs font-semibold text-red-600 hover:underline"
-                  >
-                    Find your nearest locker &rarr;
-                  </a>
+                <span className="block text-sm font-semibold text-gray-700 mb-1">
+                  Nearest PUDO Locker
                 </span>
+                <ol className="list-decimal list-inside text-xs text-gray-500 mb-2 space-y-0.5">
+                  <li>Search "PUDO" on Google Maps (or your maps app).</li>
+                  <li>Find the locker nearest to you.</li>
+                  <li>Copy its name below (add the suburb if not unique).</li>
+                </ol>
                 <input
                   type="text"
                   placeholder="e.g. PUDO Locker - Clearwater Mall"
