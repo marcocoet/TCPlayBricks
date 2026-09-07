@@ -11,7 +11,7 @@ export default function Privacy() {
           Privacy Policy
         </h1>
         <p className="text-sm text-gray-500 text-center mb-8">
-          Last updated: 16 August 2026
+          Last updated: 7 September 2026
         </p>
 
         <div className="space-y-6 text-gray-700 leading-relaxed">
@@ -68,7 +68,24 @@ export default function Privacy() {
 
           <div>
             <h2 className="text-xl font-bold text-gray-800 mb-2">
-              3. Why We Collect It
+              3. Cookies &amp; Local Storage
+            </h2>
+            <p>
+              We don't use cookies for advertising, tracking, or analytics,
+              and this site doesn't set any cookies of its own. The only
+              thing stored in your browser is your login session, kept
+              using your browser's local storage (not a cookie) so you stay
+              logged in between visits - this is strictly necessary for the
+              site to work and is removed if you log out. If you sign in
+              with Google or pay via PayFast, those pages are hosted on
+              Google's and PayFast's own sites, and any cookies set there
+              are covered by their respective privacy policies, not ours.
+            </p>
+          </div>
+
+          <div>
+            <h2 className="text-xl font-bold text-gray-800 mb-2">
+              4. Why We Collect It
             </h2>
             <p>
               We use your information to create and manage your account,
@@ -82,7 +99,7 @@ export default function Privacy() {
 
           <div>
             <h2 className="text-xl font-bold text-gray-800 mb-2">
-              4. Who We Share It With
+              5. Who We Share It With
             </h2>
             <p>We share limited personal information with:</p>
             <ul className="list-disc list-inside space-y-1 mt-2">
@@ -112,19 +129,19 @@ export default function Privacy() {
 
           <div>
             <h2 className="text-xl font-bold text-gray-800 mb-2">
-              5. How Long We Keep It
+              6. How Long We Keep It
             </h2>
             <p>
               We keep your account and order information for as long as
               your account is active, and afterward for as long as needed
               to meet our legal and tax record-keeping obligations. You can
-              ask us to delete your account at any time (see section 6).
+              ask us to delete your account at any time (see section 7).
             </p>
           </div>
 
           <div>
             <h2 className="text-xl font-bold text-gray-800 mb-2">
-              6. Your Rights
+              7. Your Rights
             </h2>
             <p>Under POPIA, you have the right to:</p>
             <ul className="list-disc list-inside space-y-1 mt-2">
@@ -138,7 +155,7 @@ export default function Privacy() {
               <li>Object to how we process your information</li>
               <li>
                 Lodge a complaint with the Information Regulator (contact
-                details in section 8) if you believe we've handled your
+                details in section 9) if you believe we've handled your
                 information unlawfully
               </li>
             </ul>
@@ -156,7 +173,7 @@ export default function Privacy() {
 
           <div>
             <h2 className="text-xl font-bold text-gray-800 mb-2">
-              7. Security
+              8. Security
             </h2>
             <p>
               We restrict access to your data so that only you can view or
@@ -169,7 +186,7 @@ export default function Privacy() {
 
           <div>
             <h2 className="text-xl font-bold text-gray-800 mb-2">
-              8. The Information Regulator
+              9. The Information Regulator
             </h2>
             <p>
               If you're unhappy with how we've handled a privacy concern,
@@ -194,7 +211,7 @@ export default function Privacy() {
 
           <div>
             <h2 className="text-xl font-bold text-gray-800 mb-2">
-              9. Changes to This Policy
+              10. Changes to This Policy
             </h2>
             <p>
               We may update this Privacy Policy from time to time. Changes
