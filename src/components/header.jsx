@@ -9,6 +9,7 @@ import { supabase } from "../supabase/supabaseClient";
 import { HomeIcon } from "@heroicons/react/16/solid";
 import Logo from "../assets/TC_PlayBricks_Logo.webp";
 import BrickButton from "./BrickButton";
+import useRole from "../admin/useRole";
 
 // The site header/nav bar, shown on every page via MainLayout.
 // `user` is passed down from App.jsx so we know whether to show
@@ -20,6 +21,9 @@ export default function Header({ user, cartCount = 0 }) {
   // Whether the mobile hamburger dropdown menu is open.
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+  // Staff/admins get an extra "Admin" link. (Showing the link is just
+  // convenience - the database itself blocks non-staff from changing data.)
+  const { isStaff } = useRole(user);
 
   // Whenever `user` changes (login/logout), fetch that user's profile row.
   useEffect(() => {
@@ -120,6 +124,21 @@ export default function Header({ user, cartCount = 0 }) {
             Contact
           </NavLink>
 
+          {isStaff && (
+            <NavLink
+              to="/admin"
+              className={({ isActive }) =>
+                `px-2 py-1 sm:px-4 sm:py-2 rounded-md font-semibold text-sm sm:text-base transition ${
+                  isActive
+                    ? "bg-red-600 text-white"
+                    : "bg-white text-gray-800 hover:bg-gray-100"
+                }`
+              }
+            >
+              Admin
+            </NavLink>
+          )}
+
           {/* Show Sign Up / Login when logged out, or the user's email +
               Logout button when logged in. */}
           {!user ? (
@@ -201,6 +220,15 @@ export default function Header({ user, cartCount = 0 }) {
           >
             Contact
           </NavLink>
+          {isStaff && (
+            <NavLink
+              to="/admin"
+              onClick={() => setMenuOpen(false)}
+              className="px-4 py-2 rounded-md bg-red-600 text-white"
+            >
+              Admin
+            </NavLink>
+          )}
           {!user ? (
             <>
               <NavLink

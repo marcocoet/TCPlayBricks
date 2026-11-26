@@ -1,6 +1,6 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { supabase } from "./supabase/supabaseClient"; // adjust path if needed
 import MainLayout from "./layout/mainlayout.jsx";
 import Signup from "./pages/signup.jsx";
@@ -16,8 +16,13 @@ import Terms from "./pages/terms.jsx";
 import Privacy from "./pages/privacy.jsx";
 import OrderSuccess from "./pages/orderSuccess.jsx";
 import OrderCancelled from "./pages/orderCancelled.jsx";
+import Spinner from "./components/Spinner.jsx";
 import Aos from "aos";
 import "aos/dist/aos.css";
+
+// The admin area is loaded only when someone opens /admin, so regular
+// customers never download its code.
+const AdminApp = lazy(() => import("./admin/AdminApp.jsx"));
 
 // App is the root component. It owns the logged-in `user` state and decides
 // which page component to render based on the current URL (routing).
@@ -26,6 +31,9 @@ function App() {
   // Login/Logout, and the cart page uses it to know whose cart to load.
   // It starts as null (not logged in) until we check for a session below.
   const [user, setUser] = useState(null);
+  // False until we've checked for a saved session - the admin area waits
+  // for this so it doesn't bounce a logged-in admin to /login on refresh.
+  const [authReady, setAuthReady] = useState(false);
 
   // Total number of items (summed quantity, not distinct lines) in the
   // logged-in user's cart. Lives up here so the header badge can show it
@@ -67,6 +75,7 @@ function App() {
       const { data } = await supabase.auth.getSession();
       const sessionUser = data.session?.user ?? null;
       setUser(sessionUser);
+      setAuthReady(true);
       refreshCartCount(sessionUser);
     }
     loadSession();
@@ -118,6 +127,20 @@ function App() {
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/order-success" element={<OrderSuccess />} />
           <Route path="/order-cancelled" element={<OrderCancelled />} />
+          <Route
+            path="/admin/*"
+            element={
+              <Suspense
+                fallback={
+                  <div className="min-h-[60vh] flex items-center justify-center">
+                    <Spinner />
+                  </div>
+                }
+              >
+                <AdminApp user={user} authReady={authReady} />
+              </Suspense>
+            }
+          />
         </Routes>
       </MainLayout>
     </Router>

@@ -21,6 +21,9 @@ export default function ProductPage({ refreshCartCount }) {
   // products grid - lets the prev/next arrows step through sets without
   // going back to the listing page.
   const [orderedSlugs, setOrderedSlugs] = useState([]);
+  // All photos for this set (main photo first) and which one is showing.
+  const [images, setImages] = useState([]);
+  const [activeImage, setActiveImage] = useState(0);
 
   // Fetch the ordering once - it doesn't depend on which product we're
   // currently viewing.
@@ -53,6 +56,8 @@ export default function ProductPage({ refreshCartCount }) {
   if (slug !== lastSlug) {
     setLastSlug(slug);
     setDesiredQty(1);
+    setImages([]);
+    setActiveImage(0);
   }
 
   // ✅ Get logged-in user
@@ -81,8 +86,22 @@ export default function ProductPage({ refreshCartCount }) {
         .eq("slug", slug)
         .single(); // exactly one row expected for a given slug
 
-      if (error) console.error("Error fetching product:", error);
-      else setSetData(data);
+      if (error) {
+        console.error("Error fetching product:", error);
+        return;
+      }
+      setSetData(data);
+
+      // Load the photo gallery: main photo first, then the saved order.
+      const { data: imgs, error: imgError } = await supabase
+        .from("set_images")
+        .select("image_id, url")
+        .eq("set_id", data.set_id)
+        .order("is_primary", { ascending: false })
+        .order("sort_order")
+        .order("image_id");
+      if (imgError) console.error("Error fetching photos:", imgError);
+      else setImages(imgs);
     }
     fetchSet();
   }, [slug]);
@@ -242,13 +261,38 @@ export default function ProductPage({ refreshCartCount }) {
           sit side-by-side from the md breakpoint up. */}
       <div className="max-w-5xl w-full bg-white shadow-lg rounded-lg overflow-hidden grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
         {/* Product Image */}
-        <div className="flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-3">
           <img
-            src={setData.image_url}
+            src={images[activeImage]?.url ?? setData.image_url}
             alt={setData.set_name}
             data-aos="fade-up"
             className="w-full h-auto object-contain rounded-lg"
           />
+          {/* Thumbnails - only shown when the set has more than one photo. */}
+          {images.length > 1 && (
+            <div className="flex flex-wrap justify-center gap-2">
+              {images.map((img, index) => (
+                <button
+                  key={img.image_id}
+                  type="button"
+                  onClick={() => setActiveImage(index)}
+                  aria-label={`Show photo ${index + 1}`}
+                  className={`h-16 w-16 rounded-md border-2 bg-white p-1 transition ${
+                    index === activeImage
+                      ? "border-red-600"
+                      : "border-gray-200 hover:border-gray-400"
+                  }`}
+                >
+                  <img
+                    src={img.url}
+                    alt=""
+                    loading="lazy"
+                    className="h-full w-full object-contain"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Product Details */}
