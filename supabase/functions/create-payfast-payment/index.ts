@@ -1,12 +1,28 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { createHash } from "node:crypto";
 
-// CORS headers so the browser (a different origin, e.g. localhost:5173)
-// is allowed to call this function.
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+// CORS: only our own site (and local dev servers) may call this function
+// from a browser. Any other website gets no Access-Control-Allow-Origin
+// header back, so the browser blocks it from reading the response.
+const ALLOWED_ORIGINS = [
+  "https://www.tcplaybricks.co.za",
+  "https://tcplaybricks.co.za",
+  "http://localhost:5173",
+  "http://localhost:4173",
+];
+
+function buildCorsHeaders(req: Request): Record<string, string> {
+  const origin = req.headers.get("Origin") ?? "";
+  const headers: Record<string, string> = {
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Vary": "Origin",
+  };
+  if (ALLOWED_ORIGINS.includes(origin)) {
+    headers["Access-Control-Allow-Origin"] = origin;
+  }
+  return headers;
+}
 
 // --- Same packing logic as cartPage.jsx, ported to TypeScript, so the
 // delivery fee charged here always matches what the user saw in their cart. ---
@@ -75,6 +91,8 @@ function generateSignature(fields: Record<string, string>, passphrase: string | 
 }
 
 Deno.serve(async (req) => {
+  const corsHeaders = buildCorsHeaders(req);
+
   // Browsers send an OPTIONS preflight before the real request - just
   // acknowledge it with the CORS headers.
   if (req.method === "OPTIONS") {
